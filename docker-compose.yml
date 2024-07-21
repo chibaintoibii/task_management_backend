@@ -15,5 +15,18 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
+  minio:
+    image: 'bitnami/minio:latest'
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      - MINIO_ROOT_USER=task_management_minio
+      - MINIO_ROOT_PASSWORD=task_management_minio
+    volumes:
+      - 'minio_data:/bitnami/minio/data'
+
 volumes:
   db-data:
+  minio_data:
+    driver: local

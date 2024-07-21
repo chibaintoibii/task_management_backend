@@ -1,5 +1,5 @@
 import {Column, CreatedAt, DataType, HasMany, Model, Table, UpdatedAt} from "sequelize-typescript";
-import {User} from "../../users/models/user.model";
+import {User} from "src/users/models/user.model";
 
 @Table({tableName: 'departments', timestamps: true})
 export class Department extends Model<Department> {

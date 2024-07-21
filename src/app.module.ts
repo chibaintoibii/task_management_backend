@@ -11,6 +11,7 @@ import {ProjectsModule} from './projects/projects.module';
 import {DepartmentsModule} from './departments/departments.module';
 import config, {ConfigInterface, MicroserviceConfig} from "./config";
 import {Department} from "./departments/models/department.model";
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import {Department} from "./departments/models/department.model";
     TasksModule,
     ProjectsModule,
     DepartmentsModule,
+    FileUploadModule,
   ],
   controllers: [],
   providers: [

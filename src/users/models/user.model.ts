@@ -1,6 +1,6 @@
 import {BelongsTo, Column, CreatedAt, DataType, ForeignKey, Model, Table, UpdatedAt} from 'sequelize-typescript';
 import {Role} from "src/common/types";
-import {Department} from "../../departments/models/department.model";
+import {Department} from "src/departments/models/department.model";
 
 @Table({tableName: 'users', timestamps: true})
 export class User extends Model<User> {

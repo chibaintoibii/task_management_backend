@@ -28,7 +28,7 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(3000, () => {
-    console.log('Application successfully started on port 3000')
+    console.log('Application has been successfully started on port 3000')
   });
 }
 
