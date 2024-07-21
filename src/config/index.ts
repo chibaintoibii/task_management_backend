@@ -1,3 +1,4 @@
+import * as process from 'process'
 export default (): ConfigInterface => ({
   microservice: {
     servers: process.env.MICROSERVICE_SERVERS

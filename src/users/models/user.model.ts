@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   CreatedAt,
   DataType,
@@ -10,12 +11,9 @@ import {
   UpdatedAt
 } from 'sequelize-typescript';
 import {Role} from "src/common/types";
+import {Department} from "../../departments/models/department.model";
 
-@Table({
-  tableName: 'users',
-  timestamps: true,
-  paranoid: true
-})
+@Table({tableName: 'users', timestamps: true})
 export class User extends Model<User> {
   @Column({primaryKey: true, autoIncrement: true, type: DataType.INTEGER, allowNull: false})
   id: number;
@@ -38,8 +36,15 @@ export class User extends Model<User> {
   // @HasMany(() => Project)
   projects: string[] // should be Project[]
 
-  // @ForeignKey(() => Department)
+  @ForeignKey(() => Department)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,  // Making the foreign key optional
+  })
   departmentId: number;
+
+  @BelongsTo(() => Department)
+  department: Department;
 
   @CreatedAt
   createdAt: Date;
@@ -53,6 +58,6 @@ export class User extends Model<User> {
   @Column({type: DataType.INTEGER, allowNull: true})
   updatedBy: number;
 
-  @DeletedAt
-  deletedAt: Date;
+  @Column({type: DataType.BOOLEAN, defaultValue: false})
+  isDeleted: boolean
 }

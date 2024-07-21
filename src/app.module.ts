@@ -9,7 +9,8 @@ import {ClientProxyFactory, Transport} from "@nestjs/microservices";
 import {TasksModule} from './tasks/tasks.module';
 import {ProjectsModule} from './projects/projects.module';
 import {DepartmentsModule} from './departments/departments.module';
-import config from "./config";
+import config, {ConfigInterface, MicroserviceConfig} from "./config";
+import {Department} from "./departments/models/department.model";
 
 @Module({
   imports: [
@@ -18,25 +19,23 @@ import config from "./config";
       envFilePath: '.env',
       load: [config]
     }),
-    AuthModule,
-    UsersModule,
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        return {
-          dialect: 'postgres',
-          host: configService.get<string>('DB_HOST'),
-          port: configService.get<number>('DB_PORT'),
-          username: configService.get<string>('DB_USER'),
-          password: configService.get<string>('DB_PASSWORD'),
-          database: configService.get<string>('DB_NAME'),
-          autoLoadModels: true,
-          models: [User],
-          synchronize: true,
-        }
-      }
+      useFactory: async (configService: ConfigService) => ({
+        dialect: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USER'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
+        autoLoadModels: true,
+        models: [User, Department],
+        synchronize: true,
+      })
     }),
+    AuthModule,
+    UsersModule,
     TasksModule,
     ProjectsModule,
     DepartmentsModule,
@@ -46,11 +45,12 @@ import config from "./config";
     {
       provide: NATS_SERVICE,
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: async (configService: ConfigService<ConfigInterface>) => {
         return ClientProxyFactory.create({
           transport: Transport.NATS,
           options: {
-            servers: [configService.get<string>('NATS_SERVER')],
+            servers:
+            configService.get<MicroserviceConfig>('microservice').servers,
           },
         });
       },
