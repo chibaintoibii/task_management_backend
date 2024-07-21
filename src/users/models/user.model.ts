@@ -1,15 +1,4 @@
-import {
-  BelongsTo,
-  Column,
-  CreatedAt,
-  DataType,
-  DeletedAt,
-  ForeignKey,
-  HasMany,
-  Model,
-  Table,
-  UpdatedAt
-} from 'sequelize-typescript';
+import {BelongsTo, Column, CreatedAt, DataType, ForeignKey, Model, Table, UpdatedAt} from 'sequelize-typescript';
 import {Role} from "src/common/types";
 import {Department} from "../../departments/models/department.model";
 

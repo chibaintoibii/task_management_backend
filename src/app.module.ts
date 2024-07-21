@@ -49,8 +49,7 @@ import {Department} from "./departments/models/department.model";
         return ClientProxyFactory.create({
           transport: Transport.NATS,
           options: {
-            servers:
-            configService.get<MicroserviceConfig>('microservice').servers,
+            servers: configService.get<MicroserviceConfig>('microservice').servers,
           },
         });
       },
