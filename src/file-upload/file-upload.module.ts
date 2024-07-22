@@ -1,7 +1,46 @@
-import { Module } from '@nestjs/common';
-import { FileUploadService } from './file-upload.service';
+import {DynamicModule, Module} from '@nestjs/common';
+import {FileUploadService} from './file-upload.service';
+import {ConfigModule, ConfigService} from "@nestjs/config";
 
-@Module({
-  providers: [FileUploadService]
-})
-export class FileUploadModule {}
+export interface FileFileUploadModuleOptions {
+  endPoint: string;
+  port: number;
+  accessKey: string;
+  secretKey: string;
+  useSSL: boolean;
+}
+
+@Module({})
+export class FileUploadModule {
+  static register(options: FileFileUploadModuleOptions): DynamicModule {
+    return {
+      module: FileUploadModule,
+      providers: [
+        {
+          provide: 'FILE_UPLOAD_OPTIONS',
+          useValue: options,
+        },
+        FileUploadService,
+      ]
+    }
+  }
+
+  static registerAsync(options: {
+    useFactory: (...args: any[]) => Promise<FileFileUploadModuleOptions> | FileFileUploadModuleOptions,
+    inject?: any[],
+  }): DynamicModule {
+    return {
+      module: FileUploadModule,
+      imports: options.inject?.includes(ConfigService) ? [ConfigModule] : [],
+      providers: [
+        FileUploadService,
+        {
+          provide: 'FILE_UPLOAD_OPTIONS',
+          useFactory: options.useFactory,
+          inject: options.inject || [],
+        }
+      ],
+      exports: [FileUploadService]
+    }
+  }
+}

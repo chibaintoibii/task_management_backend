@@ -9,9 +9,9 @@ import {ClientProxyFactory, Transport} from "@nestjs/microservices";
 import {TasksModule} from './tasks/tasks.module';
 import {ProjectsModule} from './projects/projects.module';
 import {DepartmentsModule} from './departments/departments.module';
-import config, {ConfigInterface, MicroserviceConfig} from "./config";
+import config, {ConfigInterface, MicroserviceConfig, MinioConfig} from "./config";
 import {Department} from "./departments/models/department.model";
-import { FileUploadModule } from './file-upload/file-upload.module';
+import {FileUploadModule} from './file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -40,7 +40,12 @@ import { FileUploadModule } from './file-upload/file-upload.module';
     TasksModule,
     ProjectsModule,
     DepartmentsModule,
-    FileUploadModule,
+    FileUploadModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return configService.getOrThrow<MinioConfig>('minio')
+      }
+    })
   ],
   controllers: [],
   providers: [
