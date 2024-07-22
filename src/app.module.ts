@@ -1,24 +1,28 @@
-import {Module} from '@nestjs/common';
-import {AuthModule} from './auth/auth.module';
-import {UsersModule} from './users/users.module';
-import {SequelizeModule} from '@nestjs/sequelize';
-import {User} from "./users/models/user.model";
-import {ConfigModule, ConfigService} from "@nestjs/config";
-import {NATS_SERVICE} from "./common/contants";
-import {ClientProxyFactory, Transport} from "@nestjs/microservices";
-import {TasksModule} from './tasks/tasks.module';
-import {ProjectsModule} from './projects/projects.module';
-import {DepartmentsModule} from './departments/departments.module';
-import config, {ConfigInterface, MicroserviceConfig, MinioConfig} from "./config";
-import {Department} from "./departments/models/department.model";
-import {FileUploadModule} from './file-upload/file-upload.module';
+import { Module } from '@nestjs/common';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { User } from './users/models/user.model';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { NATS_SERVICE } from './common/contants';
+import { ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { TasksModule } from './tasks/tasks.module';
+import { ProjectsModule } from './projects/projects.module';
+import { DepartmentsModule } from './departments/departments.module';
+import config, {
+  ConfigInterface,
+  MicroserviceConfig,
+  MinioConfig,
+} from './config';
+import { Department } from './departments/models/department.model';
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-      load: [config]
+      load: [config],
     }),
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
@@ -33,7 +37,7 @@ import {FileUploadModule} from './file-upload/file-upload.module';
         autoLoadModels: true,
         models: [User, Department],
         synchronize: true,
-      })
+      }),
     }),
     AuthModule,
     UsersModule,
@@ -43,9 +47,9 @@ import {FileUploadModule} from './file-upload/file-upload.module';
     FileUploadModule.registerAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        return configService.getOrThrow<MinioConfig>('minio')
-      }
-    })
+        return configService.getOrThrow<MinioConfig>('minio');
+      },
+    }),
   ],
   controllers: [],
   providers: [
@@ -56,12 +60,12 @@ import {FileUploadModule} from './file-upload/file-upload.module';
         return ClientProxyFactory.create({
           transport: Transport.NATS,
           options: {
-            servers: configService.get<MicroserviceConfig>('microservice').servers,
+            servers:
+              configService.get<MicroserviceConfig>('microservice').servers,
           },
         });
       },
-    }
+    },
   ],
 })
-export class AppModule {
-}
+export class AppModule {}

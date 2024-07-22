@@ -1,9 +1,9 @@
-import {NestFactory} from '@nestjs/core';
-import {AppModule} from './app.module';
-import {MicroserviceOptions, Transport} from "@nestjs/microservices";
-import {ConfigService} from "@nestjs/config";
-import {ConfigInterface} from "./config";
-import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
+import { ConfigInterface } from './config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,8 +14,9 @@ async function bootstrap() {
     new DocumentBuilder()
       .setTitle('Task management Backend')
       .setDescription('API description')
-      .setVersion('1.0').build()
-  )
+      .setVersion('1.0')
+      .build(),
+  );
 
   SwaggerModule.setup('docs', app, document);
 
@@ -28,7 +29,7 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(3000, () => {
-    console.log('Application has been successfully started on port 3000')
+    console.log('Application has been successfully started on port 3000');
   });
 }
 
