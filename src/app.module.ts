@@ -1,21 +1,19 @@
-import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from './users/models/user.model';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { NATS_SERVICE } from './common/contants';
-import { ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { TasksModule } from './tasks/tasks.module';
-import { ProjectsModule } from './projects/projects.module';
-import { DepartmentsModule } from './departments/departments.module';
-import config, {
-  ConfigInterface,
-  MicroserviceConfig,
-  MinioConfig,
-} from './config';
-import { Department } from './departments/models/department.model';
-import { FileUploadModule } from './file-upload/file-upload.module';
+import {Module} from '@nestjs/common';
+import {AuthModule} from './auth/auth.module';
+import {UsersModule} from './users/users.module';
+import {SequelizeModule} from '@nestjs/sequelize';
+import {User} from './users/models/user.model';
+import {ConfigModule, ConfigService} from '@nestjs/config';
+import {NATS_SERVICE} from './common/contants';
+import {ClientProxyFactory, Transport} from '@nestjs/microservices';
+import {TasksModule} from './tasks/tasks.module';
+import {ProjectsModule} from './projects/projects.module';
+import {DepartmentsModule} from './departments/departments.module';
+import config, {ConfigInterface, MicroserviceConfig, MinioConfig} from './config';
+import {Department} from './departments/models/department.model';
+import {FileUploadModule} from './file-upload/file-upload.module';
+import {Project} from "./projects/models/project.model";
+import {JwtModule, JwtModuleAsyncOptions} from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -35,7 +33,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         autoLoadModels: true,
-        models: [User, Department],
+        models: [User, Department, Project],
         synchronize: true,
       }),
     }),
@@ -50,8 +48,18 @@ import { FileUploadModule } from './file-upload/file-upload.module';
         return configService.getOrThrow<MinioConfig>('minio');
       },
     }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET_KEY'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN'),
+        },
+      }),
+      global: true,
+    } as JwtModuleAsyncOptions),
   ],
-  controllers: [],
   providers: [
     {
       provide: NATS_SERVICE,
@@ -60,8 +68,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
         return ClientProxyFactory.create({
           transport: Transport.NATS,
           options: {
-            servers:
-              configService.get<MicroserviceConfig>('microservice').servers,
+            servers: configService.get<MicroserviceConfig>('microservice').servers,
           },
         });
       },
