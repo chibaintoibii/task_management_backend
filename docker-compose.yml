@@ -25,6 +25,11 @@ services:
       - MINIO_ROOT_PASSWORD=task_management_minio
     volumes:
       - 'minio_data:/bitnami/minio/data'
+  redis:
+    image: redis:7.2.5-alpine
+    ports:
+      - '6380:6379'
+
 
 volumes:
   db-data:
