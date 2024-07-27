@@ -2,6 +2,7 @@ import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { MinioService } from './minio.service';
 import * as Minio from 'minio';
 import { FileUploadModuleOptions } from './file-upload.module';
+import {Readable} from "stream";
 
 @Injectable()
 export class FileUploadService {
@@ -42,6 +43,15 @@ export class FileUploadService {
     return {
       url: `${this.baseUrl}/${bucketName}/${objectName}`,
     };
+  }
+
+  async getFileUrl(objectName: string) {
+    return `${this.baseUrl}/${this.bucketName}/${objectName}`;
+  }
+
+  async getFileStream(objectName: string): Promise<Readable> {
+    const stream = await this.minioClient.getObject(this.bucketName, objectName);
+    return stream;
   }
 
   async deleteFile(objectName: string) {

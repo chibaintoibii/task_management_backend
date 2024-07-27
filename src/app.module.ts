@@ -1,7 +1,7 @@
 import {Module} from '@nestjs/common';
 import {AuthModule} from './auth/auth.module';
 import {UsersModule} from './users/users.module';
-import {SequelizeModule} from '@nestjs/sequelize';
+import {SequelizeModule, SequelizeModuleAsyncOptions} from '@nestjs/sequelize';
 import {User} from './users/models/user.model';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {NATS_SERVICE} from './common/contants';
@@ -9,11 +9,11 @@ import {ClientProxyFactory, Transport} from '@nestjs/microservices';
 import {TasksModule} from './tasks/tasks.module';
 import {ProjectsModule} from './projects/projects.module';
 import {DepartmentsModule} from './departments/departments.module';
-import config, {ConfigInterface, MicroserviceConfig, MinioConfig} from './config';
+import config, {ConfigInterface, MicroserviceConfig, MinioConfig, PostgresConfig} from './config';
 import {Department} from './departments/models/department.model';
 import {FileUploadModule} from './file-upload/file-upload.module';
 import {Project} from "./projects/models/project.model";
-import {JwtModule, JwtModuleAsyncOptions} from "@nestjs/jwt";
+import {ProjectMember} from "./projects/models/project-member.model";
 
 @Module({
   imports: [
@@ -26,16 +26,9 @@ import {JwtModule, JwtModuleAsyncOptions} from "@nestjs/jwt";
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        dialect: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
-        autoLoadModels: true,
-        models: [User, Department, Project],
-        synchronize: true,
-      }),
+        ...configService.getOrThrow<PostgresConfig>('db'),
+        models: [User, Department, Project, ProjectMember],
+      } as SequelizeModuleAsyncOptions),
     }),
     AuthModule,
     UsersModule,
@@ -48,17 +41,6 @@ import {JwtModule, JwtModuleAsyncOptions} from "@nestjs/jwt";
         return configService.getOrThrow<MinioConfig>('minio');
       },
     }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET_KEY'),
-        signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN'),
-        },
-      }),
-      global: true,
-    } as JwtModuleAsyncOptions),
   ],
   providers: [
     {
@@ -75,4 +57,5 @@ import {JwtModule, JwtModuleAsyncOptions} from "@nestjs/jwt";
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+}

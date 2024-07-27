@@ -1,7 +1,7 @@
 import {
   Column,
   CreatedAt,
-  DataType,
+  DataType, ForeignKey,
   HasMany,
   Model,
   Table,
@@ -10,7 +10,7 @@ import {
 import { User } from 'src/users/models/user.model';
 
 @Table({ tableName: 'departments', timestamps: true })
-export class Department extends Model<Department> {
+export class Department extends Model {
   @Column({
     primaryKey: true,
     autoIncrement: true,
@@ -22,18 +22,20 @@ export class Department extends Model<Department> {
   @Column({ type: DataType.STRING, allowNull: false })
   name: string;
 
-  @Column({ type: DataType.STRING, allowNull: true })
+  @Column({ type: DataType.TEXT, allowNull: true })
   description?: string;
 
   @CreatedAt
   createdAt: Date;
 
+  @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER, allowNull: true })
   createdBy: number;
 
   @UpdatedAt
   updatedAt: Date;
 
+  @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER, allowNull: true })
   updatedBy: number;
 

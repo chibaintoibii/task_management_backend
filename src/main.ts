@@ -4,10 +4,14 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { ConfigInterface } from './config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {ValidationPipe} from "@nestjs/common";
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.use(cookieParser());
+  app.enableCors()
+  app.useGlobalPipes(new ValidationPipe())
   const config = app.get<ConfigService<ConfigInterface>>(ConfigService);
   const document = SwaggerModule.createDocument(
     app,

@@ -1,25 +1,65 @@
 import {
-  Controller,
-  Get,
-  Post,
+  Body,
+  Controller, Delete,
+  Get, Param,
+  Post, Put, Req, Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {UsersService} from './users.service';
+import {FileInterceptor} from '@nestjs/platform-express';
+import {CreateUserBodyDto} from "./dto/create-user-body.dto";
+import {FileUploadService} from "../file-upload/file-upload.service";
+import {PathIdDto} from "../common/dto/path-id.dto";
+import {UpdateUserBodyDto} from "./dto/update-user-body.dto";
+
+import {Request, Response} from 'express';
+
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly fileUploadService: FileUploadService,) {
+  }
+
+  @Post()
+  createUser(@Body() dto: CreateUserBodyDto) {
+    return this.usersService.create(dto);
+  }
 
   @Get()
-  getAllUsers() {
+  async findAllUsers(@Req() request: Request) {
+    console.log('request.cookies', request.cookies)
+    console.log('request.headers', request.headers)
     return this.usersService.findAll();
   }
 
-  @Post('upload')
+  @Get(':/id')
+  async findUserById(@Param() param: PathIdDto) {
+    return this.usersService.findOne(param.id);
+  }
+
+  @Put('/:id')
+  updateUserDetails(@Param() param: PathIdDto, @Body() body: UpdateUserBodyDto) {
+    return this.usersService.update({
+      ...body,
+      id: param.id
+    })
+  }
+
+  @Delete('/:id')
+  async deleteUser(@Param() param: PathIdDto) {
+    return this.usersService.delete(param.id);
+  }
+
+  @Post('/upload-photo')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const result = await this.usersService.uploadPhoto(file);
+    const result = await this.fileUploadService.uploadFile(file);
     return result;
+  }
+
+  @Get('files/:filename')
+  async getFile(@Param('filename') filename: string, @Res() res: Response) {
+    const fileStream = await this.usersService.getFileStream(filename);
+    fileStream.pipe(res);
   }
 }
