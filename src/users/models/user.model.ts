@@ -3,7 +3,7 @@ import {
   Column,
   CreatedAt,
   DataType,
-  ForeignKey,
+  ForeignKey, HasMany,
   Model,
   Table,
   UpdatedAt,
@@ -12,6 +12,7 @@ import {Department} from 'src/departments/models/department.model';
 import {Project} from "../../projects/models/project.model";
 import {ProjectMember} from "../../projects/models/project-member.model";
 import {Role} from "../../auth/roles/role.enum";
+import {Task} from "../../tasks/models/task.model";
 
 @Table({tableName: 'users', timestamps: true})
 export class User extends Model<User> {
@@ -67,4 +68,6 @@ export class User extends Model<User> {
   @BelongsToMany(() => Project, () => ProjectMember)
   projects: Project[];
 
+  @HasMany(() => Task)
+  tasks: Task[]
 }

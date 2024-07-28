@@ -14,6 +14,7 @@ import {Department} from './departments/models/department.model';
 import {FileUploadModule} from './file-upload/file-upload.module';
 import {Project} from "./projects/models/project.model";
 import {ProjectMember} from "./projects/models/project-member.model";
+import {Task} from "./tasks/models/task.model";
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import {ProjectMember} from "./projects/models/project-member.model";
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         ...configService.getOrThrow<PostgresConfig>('db'),
-        models: [User, Department, Project, ProjectMember],
+        models: [User, Department, Project, ProjectMember, Task],
       } as SequelizeModuleAsyncOptions),
     }),
     AuthModule,
