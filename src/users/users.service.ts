@@ -11,23 +11,24 @@ import {Readable} from "stream";
 export class UsersService {
   constructor(
     @InjectModel(User)
-    private userModel: typeof User,private readonly fileUploadService: FileUploadService
+    private userModel: typeof User,
+    private readonly fileUploadService: FileUploadService
   ) {
   }
 
   async create(data: CreateUserDto): Promise<User> {
     const candidate = await this.findByUsername(data.username);
-    if (candidate) throw new BadRequestException('User with this username is exists');
+    if (candidate) throw new BadRequestException('User with this username is already exists');
     const hashPassword = await bcrypt.hash(data.password, 10);
     return this.userModel.create({
       ...data, password: hashPassword
     });
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll() {
     return this.userModel.findAll({
       where: {isDeleted: false},
-
+      attributes: ['id', 'username',  'fullName', 'phone', 'position', 'image', 'role'],
     });
   }
 

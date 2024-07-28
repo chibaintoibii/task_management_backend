@@ -5,10 +5,7 @@ import * as bcrypt from 'bcrypt';
 import {ConfigService} from "@nestjs/config";
 import {JwtTokensDto} from "./dto/jwt-tokens.dto";
 import {LoginUserDto} from "./dto/login-user.dto";
-import {RefreshTokenDto} from "./dto/refresh-token.dto";
-import {Role} from "./roles/role.enum";
 import {JwtUserPayload} from "./types";
-
 
 
 @Injectable()
@@ -35,33 +32,35 @@ export class AuthService {
     return this._generateTokens(payload);
   }
 
-  private async _generateTokens(payload: JwtUserPayload): Promise<JwtTokensDto> {
-    return {
-      accessToken:
-        await this.jwtService.signAsync(payload, {
-        expiresIn: '15m'
-      }),
-      refreshToken:
-        await this.jwtService.signAsync(payload, {
-        expiresIn: '1h',
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET_KEY'),
-      })
-    }
-  }
-
-  async refreshToken(args: RefreshTokenDto): Promise<JwtTokensDto> {
-    // Todo: check accessToken is not expired
+  async refreshToken(refreshToken: string) {
     try {
-      const payload: JwtUserPayload = await this.jwtService.verifyAsync(
-        args.token,
+      const payload = await this.jwtService.verifyAsync(
+        refreshToken,
         {
           secret: this.configService.get<string>('JWT_REFRESH_SECRET_KEY')
         }
       );
+      delete payload.exp
+      console.log('verified', payload);
       return this._generateTokens(payload);
-    } catch {
+    } catch (e) {
+      console.log(e);
       throw new UnauthorizedException();
     }
-    // return this.generateTokens(payload);
   }
+
+  private async _generateTokens(payload: JwtUserPayload): Promise<JwtTokensDto> {
+    return {
+      accessToken: await this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET_KEY')
+      }),
+      refreshToken: await this.jwtService.signAsync(payload,
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET_KEY'),
+          expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
+        }
+      )
+    }
+  }
+
 }
