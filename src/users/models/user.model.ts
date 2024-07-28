@@ -1,9 +1,11 @@
 import {
-  BelongsTo, BelongsToMany,
+  BelongsTo,
+  BelongsToMany,
   Column,
   CreatedAt,
   DataType,
-  ForeignKey, HasMany,
+  ForeignKey,
+  HasMany,
   Model,
   Table,
   UpdatedAt,
@@ -28,7 +30,7 @@ export class User extends Model<User> {
   @Column({type: DataType.STRING, allowNull: false})
   password: string;
 
-  @Column({type: DataType.STRING, allowNull: true})
+  @Column({type: DataType.STRING})
   phone: string;
 
   @Column
@@ -37,16 +39,12 @@ export class User extends Model<User> {
   @Column({type: DataType.ENUM, values: Object.values(Role), allowNull: false,})
   role: Role; // admin, employee, ...
 
-  @Column({type: DataType.STRING, allowNull: true})
+  @Column({type: DataType.STRING})
   image: string; // image url
 
   @ForeignKey(() => Department)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true, // Making the foreign key optional,
-    field: 'department_id'
-  })
-  departmentId?: number;
+  @Column({type: DataType.INTEGER, field: 'department_id'})
+  departmentId: number;
 
   @BelongsTo(() => Department)
   department: Department;
@@ -55,14 +53,14 @@ export class User extends Model<User> {
   @Column({field: 'created_at'})
   createdAt: Date;
 
-  @Column({type: DataType.INTEGER, allowNull: true, field: 'created_by'})
+  @Column({type: DataType.INTEGER, field: 'created_by'})
   createdBy: number
 
   @UpdatedAt
-  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})
+  @Column({type: DataType.INTEGER, field: 'updated_at'})
   updatedAt: Date;
 
-  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})
+  @Column({type: DataType.INTEGER, field: 'updated_by'})
   updatedBy: number;
 
   @Column({type: DataType.BOOLEAN, defaultValue: false, field: 'is_deleted'})

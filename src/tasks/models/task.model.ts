@@ -1,4 +1,4 @@
-import {Column, CreatedAt, DataType, ForeignKey, Model, Table, UpdatedAt} from "sequelize-typescript";
+import {BelongsTo, Column, CreatedAt, DataType, ForeignKey, Model, Table, UpdatedAt} from "sequelize-typescript";
 import {TaskStatus} from "../types/task-status.enum";
 import {Project} from "../../projects/models/project.model";
 import {User} from "../../users/models/user.model";
@@ -18,14 +18,20 @@ export class Task extends Model<Task> {
   @Column({type: DataType.INTEGER, allowNull: false, field: 'project_id'})
   projectId: number;
 
+  @BelongsTo(() => Project)
+  project: Project
+
   @Column({type: DataType.INTEGER, allowNull: false})
   author: number;
 
   @ForeignKey(() => User)
-  @Column({type: DataType.INTEGER, allowNull: false})
-  executor: number;
+  @Column({type: DataType.INTEGER, allowNull: false, field: 'executor_id'})
+  executorId: number;
 
-  @Column({type: DataType.STRING, allowNull: false, field: 'start_time'})
+  @BelongsTo(() => User)
+  executor: User
+
+  @Column({type: DataType.STRING, allowNull: true, field: 'start_time'})
   startTime: string;
 
   @Column({type: DataType.STRING, allowNull: false, field: 'end_time'})
@@ -54,7 +60,7 @@ export class Task extends Model<Task> {
   createdBy: number
 
   @UpdatedAt
-  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})
+  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_at'})
   updatedAt: Date;
 
   @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})

@@ -10,7 +10,7 @@ import {
 import { User } from 'src/users/models/user.model';
 
 @Table({ tableName: 'departments', timestamps: true })
-export class Department extends Model {
+export class Department extends Model<Department> {
   @Column({
     primaryKey: true,
     autoIncrement: true,
@@ -22,21 +22,22 @@ export class Department extends Model {
   @Column({ type: DataType.STRING, allowNull: false })
   name: string;
 
-  @Column({ type: DataType.TEXT, allowNull: true })
+  @Column({ type: DataType.TEXT })
   description: string;
 
   @CreatedAt
   @Column({field: 'created_at'})
   createdAt: Date;
 
-  @Column({type: DataType.INTEGER, allowNull: true, field: 'created_by'})
+  @ForeignKey(() => User)
+  @Column({type: DataType.INTEGER, field: 'created_by'})
   createdBy: number
 
   @UpdatedAt
-  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})
+  @Column({type: DataType.INTEGER, field: 'updated_by'})
   updatedAt: Date;
 
-  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})
+  @Column({type: DataType.INTEGER, field: 'updated_by'})
   updatedBy: number;
 
   @Column({type: DataType.BOOLEAN, defaultValue: false, field: 'is_deleted'})
