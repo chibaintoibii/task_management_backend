@@ -1,13 +1,5 @@
-import {
-  Body,
-  Controller, Delete,
-  Get, Param,
-  Post, Put, Req, Res,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Req, Res,} from '@nestjs/common';
 import {UsersService} from './users.service';
-import {FileInterceptor} from '@nestjs/platform-express';
 import {CreateUserBodyDto} from "./dto/create-user-body.dto";
 import {FileUploadService} from "../file-upload/file-upload.service";
 import {PathIdDto} from "../common/dto/path-id.dto";
@@ -50,12 +42,11 @@ export class UsersController {
     return this.usersService.delete(param.id);
   }
 
-  @Post('/upload-photo')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const result = await this.fileUploadService.uploadFile(file);
-    return result;
-  }
+  // @Post('/upload-photo')
+  // @UseInterceptors(FileInterceptor('file'))
+  // async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  //   return await this.fileUploadService.uploadFile(file);
+  // }
 
   @Get('files/:filename')
   async getFile(@Param('filename') filename: string, @Res() res: Response) {

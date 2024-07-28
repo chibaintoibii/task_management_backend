@@ -3,7 +3,7 @@ import {User} from "../../users/models/user.model";
 import {Project} from "./project.model";
 
 @Table({tableName: 'project_members'})
-export class ProjectMember extends Model {
+export class ProjectMember extends Model<ProjectMember> {
   @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;
 
