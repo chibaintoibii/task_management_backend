@@ -7,12 +7,9 @@ import {JwtTokensDto} from "./dto/jwt-tokens.dto";
 import {LoginUserDto} from "./dto/login-user.dto";
 import {RefreshTokenDto} from "./dto/refresh-token.dto";
 import {Role} from "./roles/role.enum";
+import {JwtUserPayload} from "./types";
 
-export interface JwtUserPayload {
-  id: number;
-  username: string;
-  role: Role;
-}
+
 
 @Injectable()
 export class AuthService {

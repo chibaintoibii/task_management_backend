@@ -40,7 +40,7 @@ export class Task extends Model<Task> {
   @Column({type: DataType.ENUM, values: Object.values(TaskStatus), allowNull: false, defaultValue: TaskStatus.NEW})
   status: TaskStatus;
 
-  @Column({type: DataType.INTEGER, defaultValue: 0}) // from 0 to 10
+  @Column({type: DataType.INTEGER, defaultValue: 1}) // from 1 to 10
   complexity: number;
 
   @Column({type: DataType.ARRAY(DataType.STRING), defaultValue: [], field: 'attached_files'})
@@ -56,11 +56,11 @@ export class Task extends Model<Task> {
   @Column({field: 'created_at'})
   createdAt: Date;
 
-  @Column({type: DataType.INTEGER, allowNull: true, field: 'created_by'})
+  @Column({type: DataType.INTEGER, field: 'created_by'})
   createdBy: number
 
   @UpdatedAt
-  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_at'})
+  @Column({field: 'updated_at'})
   updatedAt: Date;
 
   @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})

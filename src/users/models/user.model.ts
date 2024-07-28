@@ -57,7 +57,7 @@ export class User extends Model<User> {
   createdBy: number
 
   @UpdatedAt
-  @Column({type: DataType.INTEGER, field: 'updated_at'})
+  @Column({field: 'updated_at'})
   updatedAt: Date;
 
   @Column({type: DataType.INTEGER, field: 'updated_by'})
