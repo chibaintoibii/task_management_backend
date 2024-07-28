@@ -23,24 +23,24 @@ export class Project extends Model<Project> {
   @Column({type: DataType.TEXT, allowNull: true})
   description: string
 
-  @Column({type: DataType.INTEGER, allowNull: false})
+  @Column({type: DataType.INTEGER, allowNull: false, field: 'department_id'})
   departmentId: number;
 
   @CreatedAt
+  @Column({field: 'created_at'})
   createdAt: Date;
 
-  @ForeignKey(() => User)
-  @Column({type: DataType.INTEGER, allowNull: true})
-  createdBy: number;
+  @Column({type: DataType.INTEGER, allowNull: true, field: 'created_by'})
+  createdBy: number
 
   @UpdatedAt
+  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})
   updatedAt: Date;
 
-  @ForeignKey(() => User)
-  @Column({type: DataType.INTEGER, allowNull: true})
+  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})
   updatedBy: number;
 
-  @Column({type: DataType.BOOLEAN, defaultValue: false})
+  @Column({type: DataType.BOOLEAN, defaultValue: false, field: 'is_deleted'})
   isDeleted: boolean;
 
   @BelongsToMany(() => User, () => ProjectMember)

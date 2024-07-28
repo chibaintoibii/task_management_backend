@@ -19,7 +19,7 @@ export class User extends Model<User> {
   @Column({primaryKey: true, autoIncrement: true, type: DataType.INTEGER, allowNull: false,})
   id: number;
 
-  @Column({type: DataType.STRING, allowNull: false})
+  @Column({type: DataType.STRING, allowNull: false, field: 'full_name'})
   fullName: string;
 
   @Column({type: DataType.STRING, allowNull: false, unique: true})
@@ -43,7 +43,8 @@ export class User extends Model<User> {
   @ForeignKey(() => Department)
   @Column({
     type: DataType.INTEGER,
-    allowNull: true, // Making the foreign key optional
+    allowNull: true, // Making the foreign key optional,
+    field: 'department_id'
   })
   departmentId?: number;
 
@@ -51,18 +52,20 @@ export class User extends Model<User> {
   department: Department;
 
   @CreatedAt
+  @Column({field: 'created_at'})
   createdAt: Date;
 
-  @Column({type: DataType.INTEGER, allowNull: true})
-  createdBy: number;
+  @Column({type: DataType.INTEGER, allowNull: true, field: 'created_by'})
+  createdBy: number
 
   @UpdatedAt
+  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})
   updatedAt: Date;
 
-  @Column({type: DataType.INTEGER, allowNull: true})
+  @Column({type: DataType.INTEGER, allowNull: true, field: 'updated_by'})
   updatedBy: number;
 
-  @Column({type: DataType.BOOLEAN, defaultValue: false})
+  @Column({type: DataType.BOOLEAN, defaultValue: false, field: 'is_deleted'})
   isDeleted: boolean;
 
   @BelongsToMany(() => Project, () => ProjectMember)
