@@ -1,47 +1,31 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
-import {InjectModel} from '@nestjs/sequelize';
-import {User} from './models/user.model';
+import {Injectable} from '@nestjs/common';
+import {User, UserDocument} from './schemas/user.schema';
 import {FileUploadService} from '../file-upload/file-upload.service';
 import {CreateUserDto} from "./dto/create-user.dto";
-import * as bcrypt from 'bcrypt'
 import {UpdateUserDto} from "./dto/update-user.dto";
 import {Readable} from "stream";
+import {InjectModel} from '@nestjs/mongoose';
+import {Model} from 'mongoose';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User)
-    private userModel: typeof User,
+    @InjectModel(User.name)
+    private readonly userModel: Model<UserDocument>,
     private readonly fileUploadService: FileUploadService
   ) {
   }
 
-  async create(data: CreateUserDto): Promise<User> {
-    const candidate = await this.findByUsername(data.username);
-    if (candidate) throw new BadRequestException('User with this username is already exists');
-    const hashPassword = await bcrypt.hash(data.password, 10);
-    return this.userModel.create({
-      ...data, password: hashPassword
-    });
+  async create(data: CreateUserDto) {
+
   }
 
   async findAll() {
-    return this.userModel.findAll({
-      where: {isDeleted: false},
-      attributes: ['id', 'username',  'fullName', 'phone', 'position', 'image', 'role'],
-    });
+
   }
 
-  async findOne(id: number): Promise<User> {
-    const user = await this.userModel.findByPk(id, {
-      attributes: {
-        exclude: ['password']
-      }
-    });
+  async findOne(id: number) {
 
-    if (!user) throw new NotFoundException('User not found');
-
-    return user;
   }
 
   async findByUsername(username: string): Promise<User> {
@@ -50,23 +34,12 @@ export class UsersService {
     })
   }
 
-  async update(data: UpdateUserDto): Promise<User> {
-    let user = await this.userModel.findByPk(data.id);
+  async update(data: UpdateUserDto) {
 
-    if (!user) throw new NotFoundException('User not found');
-    const hashPassword = await bcrypt.hash(data.password, 10);
-    await user.update({
-      ...data,
-      password: hashPassword
-    })
-    return user;
   }
 
   async delete(id: number): Promise<{ deleted: boolean }> {
-    let user = await this.userModel.findByPk(id);
 
-    if (!user) throw new NotFoundException('User not found');
-    await user.update({isDeleted: true});
     return {deleted: true}
   }
 

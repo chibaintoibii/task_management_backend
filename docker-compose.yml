@@ -4,17 +4,16 @@ services:
     image: bitnami/nats:2.10.18
     ports:
       - '4242:4222'
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: islom0811
-      POSTGRES_DB: task_management
+  mongodb:
+    image: mongo:latest
+    restart: always
     ports:
-      - "5433:5432"
+      - '27018:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: islom_user
+      MONGO_INITDB_ROOT_PASSWORD: islom0811
     volumes:
-      - db-data:/var/lib/postgresql/data
-
+      - mongo-data:/data/db
   minio:
     image: 'bitnami/minio:latest'
     ports:
@@ -30,8 +29,7 @@ services:
     ports:
       - '6380:6379'
 
-
 volumes:
-  db-data:
+  mongo-data:
   minio_data:
     driver: local

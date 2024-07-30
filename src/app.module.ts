@@ -1,20 +1,15 @@
 import {Module} from '@nestjs/common';
 import {AuthModule} from './auth/auth.module';
 import {UsersModule} from './users/users.module';
-import {SequelizeModule, SequelizeModuleAsyncOptions} from '@nestjs/sequelize';
-import {User} from './users/models/user.model';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {NATS_SERVICE} from './common/contants';
 import {ClientProxyFactory, Transport} from '@nestjs/microservices';
 import {TasksModule} from './tasks/tasks.module';
 import {ProjectsModule} from './projects/projects.module';
 import {DepartmentsModule} from './departments/departments.module';
-import config, {ConfigInterface, MicroserviceConfig, MinioConfig, PostgresConfig} from './config';
-import {Department} from './departments/models/department.model';
+import config, {ConfigInterface, MicroserviceConfig, MinioConfig} from './config';
 import {FileUploadModule} from './file-upload/file-upload.module';
-import {Project} from "./projects/models/project.model";
-import {ProjectMember} from "./projects/models/project-member.model";
-import {Task} from "./tasks/models/task.model";
+import {MongooseModule, MongooseModuleOptions} from "@nestjs/mongoose";
 
 @Module({
   imports: [
@@ -23,14 +18,7 @@ import {Task} from "./tasks/models/task.model";
       envFilePath: '.env',
       load: [config],
     }),
-    SequelizeModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        ...configService.getOrThrow<PostgresConfig>('db'),
-        models: [User, Department, Project, ProjectMember, Task],
-      } as SequelizeModuleAsyncOptions),
-    }),
+
     AuthModule,
     UsersModule,
     TasksModule,
@@ -42,6 +30,15 @@ import {Task} from "./tasks/models/task.model";
         return configService.getOrThrow<MinioConfig>('minio');
       },
     }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          uri: configService.get<string>('MONGODB_URI')
+        } as MongooseModuleOptions
+      }
+    })
   ],
   providers: [
     {

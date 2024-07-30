@@ -4,8 +4,8 @@ import {UsersService} from "../users/users.service";
 import * as bcrypt from 'bcrypt';
 import {ConfigService} from "@nestjs/config";
 import {JwtTokensDto} from "./dto/jwt-tokens.dto";
-import {LoginUserDto} from "./dto/login-user.dto";
-import {JwtUserPayload} from "./types";
+import {JwtPayload} from "jsonwebtoken";
+import {UserDocument} from "../users/schemas/user.schema";
 
 
 @Injectable()
@@ -17,22 +17,34 @@ export class AuthService {
   ) {
   }
 
-  async login(data: LoginUserDto): Promise<JwtTokensDto> {
-    const user = await this.usersService.findByUsername(data.username);
-    if (!user) {
-      throw new UnauthorizedException();
+  async login(user: UserDocument): Promise<JwtTokensDto> {
+
+    const payload: JwtPayload = {
+      id: user._id, role: user.role, username: user.username
     }
-    const isMatchedPassword: boolean = await bcrypt.compare(data.password, user.password);
-    if (!isMatchedPassword) {
-      throw new UnauthorizedException();
+    return {
+      accessToken: await this._generateAccessToken(payload),
+      refreshToken: await this.jwtService.signAsync(payload,
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET_KEY'),
+          expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
+        }
+      )
     }
-    const payload: JwtUserPayload = {
-      id: user.id, role: user.role, username: user.username
-    }
-    return this._generateTokens(payload);
   }
 
-  async refreshToken(refreshToken: string) {
+  async validateUser(username: string, password: string) {
+    const user = await this.usersService.findByUsername(username);
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      delete user.password;
+      return user;
+    }
+
+    return null;
+  }
+
+  async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
     try {
       const payload = await this.jwtService.verifyAsync(
         refreshToken,
@@ -41,26 +53,18 @@ export class AuthService {
         }
       );
       delete payload.exp
-      console.log('verified', payload);
-      return this._generateTokens(payload);
+      return {
+        accessToken: await this._generateAccessToken(payload)
+      }
     } catch (e) {
-      console.log(e);
       throw new UnauthorizedException();
     }
   }
 
-  private async _generateTokens(payload: JwtUserPayload): Promise<JwtTokensDto> {
-    return {
-      accessToken: await this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_ACCESS_SECRET_KEY')
-      }),
-      refreshToken: await this.jwtService.signAsync(payload,
-        {
-          secret: this.configService.get<string>('JWT_REFRESH_SECRET_KEY'),
-          expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
-        }
-      )
-    }
+  private async _generateAccessToken(payload: JwtPayload) {
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_ACCESS_SECRET_KEY')
+    })
   }
 
 }

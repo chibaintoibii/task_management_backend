@@ -14,22 +14,11 @@ export default (): ConfigInterface => ({
     useSSL: false,
     bucketName: 'uploads',
   },
-  db: {
-    dialect: 'postgres',
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT),
-    synchronize: true,
-    autoLoadModels: false,
-  }
 });
 
 export interface ConfigInterface {
   microservice: MicroserviceConfig;
   minio: MinioConfig;
-  db: PostgresConfig
 }
 
 export interface MinioConfig {
@@ -43,15 +32,4 @@ export interface MinioConfig {
 
 export interface MicroserviceConfig {
   servers: string[];
-}
-
-export interface PostgresConfig {
-  dialect: string
-  host: string
-  port: number
-  username: string
-  password: string
-  database: string
-  autoLoadModels: boolean
-  synchronize: boolean
 }

@@ -4,9 +4,13 @@ import {AuthController} from './auth.controller';
 import {JwtModule, JwtModuleAsyncOptions} from "@nestjs/jwt";
 import {UsersModule} from "../users/users.module";
 import {ConfigModule, ConfigService} from "@nestjs/config";
+import {LocalStrategy} from "./local.strategy";
+import {LocalAuthGuard} from "./local-auth.guard";
+import {JwtAuthGuard} from "./jwt-auth.guard";
+import {JwtStrategy} from "./jwt.strategy";
 
 @Module({
-  providers: [AuthService],
+  providers: [AuthService, LocalStrategy, LocalAuthGuard, JwtStrategy, JwtAuthGuard],
   controllers: [AuthController],
   imports: [
     JwtModule.registerAsync({

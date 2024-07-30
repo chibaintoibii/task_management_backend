@@ -1,12 +1,17 @@
-import { Module } from '@nestjs/common';
-import { TasksService } from './tasks.service';
-import { TasksController } from './tasks.controller';
-import {SequelizeModule} from "@nestjs/sequelize";
-import {Task} from "./models/task.model";
+import {Module} from '@nestjs/common';
+import {TasksService} from './tasks.service';
+import {TasksController} from './tasks.controller';
+import {Task, TaskSchema} from "./schemas/task.schema";
+import {MongooseModule} from "@nestjs/mongoose";
 
 @Module({
   controllers: [TasksController],
   providers: [TasksService],
-  imports: [SequelizeModule.forFeature([Task])]
+  imports: [
+    MongooseModule.forFeature([{
+      schema: TaskSchema, name: Task.name
+    }])
+  ]
 })
-export class TasksModule {}
+export class TasksModule {
+}
