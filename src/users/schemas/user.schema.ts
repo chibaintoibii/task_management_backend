@@ -6,31 +6,35 @@ export type UserDocument = User & Document
 
 @Schema({timestamps: true})
 export class User {
-  @Prop()
+  @Prop({type: String, required: true})
   fullName: string;
 
-  @Prop()
+  @Prop({type: String, required: true, unique: true})
   username: string;
 
-  @Prop()
+  @Prop({type: String, required: true})
   password: string;
 
-  @Prop()
+  @Prop({type: String})
   phone: string;
 
-  @Prop()
+  @Prop({type: String})
   position?: string
 
-  @Prop()
+  @Prop({type: String, default: Role.EMPLOYEE})
   role: Role;
 
-  @Prop()
-  image: string; // image url
+  @Prop({type: String})
+  image?: string; // image url
 
-  @Prop()
-  department: Types.ObjectId;
+  @Prop({type: Types.ObjectId, ref: 'Department'})
+  department?: Types.ObjectId;
 
-  @Prop()
+  @Prop({
+    default: [],
+    type: [Types.ObjectId],
+    ref: 'Project'
+  })
   projects: Types.ObjectId[]
 
   @Prop({type: Types.ObjectId, ref: 'User'})
@@ -39,7 +43,7 @@ export class User {
   @Prop({type: Types.ObjectId, ref: 'User', default: null})
   updatedBy: Types.ObjectId;
 
-  @Prop()
+  @Prop({type: Boolean, default: false})
   isDeleted: boolean
 }
 

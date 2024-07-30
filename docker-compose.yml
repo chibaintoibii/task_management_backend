@@ -6,7 +6,6 @@ services:
       - '4242:4222'
   mongodb:
     image: mongo:latest
-    restart: always
     ports:
       - '27018:27017'
     environment:

@@ -17,6 +17,7 @@ export class UsersService {
   }
 
   async create(data: CreateUserDto) {
+    const candidate = await this.userModel.findOne({username: data.username, isDeleted: false}).findOne()
 
   }
 
